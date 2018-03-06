@@ -1,15 +1,18 @@
 from converter import converter
-from converter import pybar_yarr_mapping
 
 import json
 from tabulate import tabulate
 c = converter()
-d = c.read_from_json('dat/fei4.json')
+#d = c.read_from_json('dat/fei4.json')
 c.read_from_pybar(
     './dat/module_0/configs/1_module_0_init_scan.cfg',
     './dat/module_0/fdacs/fdac_1_module_0_init_scan.dat',
     './dat/module_0/tdacs/tdac_1_module_0_init_scan.dat',
-    [])
+    [
+        './dat/module_0/masks/c_high_1_module_0_init_scan.dat',
+        './dat/module_0/masks/c_low_1_module_0_init_scan.dat',
+        './dat/module_0/masks/c_enable_1_module_0_init_scan.dat',
+        './dat/module_0/masks/imon_1_module_0_init_scan.dat',])
 
 c.pybar_to_json_complex_conversion()
 c.dump_to_json()

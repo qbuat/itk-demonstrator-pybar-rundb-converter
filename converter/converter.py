@@ -5,9 +5,12 @@ import numpy as np
 from .registry import *
 
 __all__ = [
-    'pybar_yarr_mapping',
-    'converter'
+    'converter',
 ]
+
+JSON_TEMPLATE = os.path.join(os.path.dirname(__file__), '../dat/fei4.json')
+
+
 
 pybar_yarr_mapping = [
     ('Chip_ID', 'chipId'),
@@ -47,9 +50,9 @@ pybar_yarr_mapping = [
     ('Vcal_Coeff_0', 'vcalOffset'),
 ]
 
-complex_conversion = [
-    m[0] for m in pybar_yarr_mapping if m[1] == 'TOBEDETERMINED'
-]
+#complex_conversion = [
+#    m[0] for m in pybar_yarr_mapping if m[1] == 'TOBEDETERMINED'
+#]
 
 class converter(object):
     """
@@ -57,7 +60,7 @@ class converter(object):
     demonstrator
     """
 
-    def __init__(self):
+    def __init__(self, yarr_to_pybar=True):
         """
         """
         self._keys = []
@@ -67,6 +70,16 @@ class converter(object):
         self._json_dict = {}
         self._pybar_dict = {}
         self._dict_pybar_to_json_complex = {}
+        self._yarr_pixelconfig = []
+
+        if yarr_to_pybar:
+            print 10 * '-'
+            print '--> Convert pybar files to YARR json'
+            self.read_from_json(JSON_TEMPLATE)
+        else:
+            print 10 * '-'
+            print '--> Convert YARR json to pybar files'
+
 
     def read_from_json(self, path):
         with open(path, 'r') as f:
@@ -100,8 +113,7 @@ class converter(object):
 
     def dump_to_json(self, output='tmp.json'):
         
-        template_filename = os.path.join(os.path.dirname(__file__), '../dat/fei4.json')
-        with open(template_filename, 'r') as ftemplate:
+        with open(JSON_TEMPLATE, 'r') as ftemplate:
             template_json = json.load(ftemplate)
 
             # hardcode new json structure
@@ -129,22 +141,47 @@ class converter(object):
                         if k == y:
                             new_json['FE-I4B'][block][k] = arg_type(self._pybar_dict[p])
 
-
-            new_json = json.dumps(new_json, sort_keys=True, indent=4, separators=(',', ': '))
+            new_json['FE-I4B']['PixelConfig'] = self._yarr_pixelconfig
+            new_json = json.dumps(new_json, sort_keys=True, indent=3, separators=(',', ': '))
             out_json = open(output, 'wb')
             out_json.write(new_json)
 
 
     def read_from_pybar(
         self, config, fdac, tdac, masks):
+        # parse the config file
         with open(config, 'r') as config_file:
             for l in config_file.readlines():
                 stripped_line = l.strip().split(' ')
                 if stripped_line[0] in ('', '#'):
                     continue
-                print stripped_line
                 self._pybar_keys.append(stripped_line[0])
                 self._pybar_dict[stripped_line[0]] = stripped_line[1]
+
+        # parse the fdac file
+        fdac_list = []
+        with open(fdac, 'r') as fdac_file:
+            for l in fdac_file.readlines():
+                stripped_line = l.strip().replace('  ', ' ').split(' ')
+                if '#' in stripped_line:
+                    continue
+                filtered_line = filter(lambda a: a != '', stripped_line[1:]) 
+                int_filt_line = [int(i) for i in filtered_line]
+                fdac_list.append(int_filt_line)
+
+        # parse the tdac file
+        tdac_list = []
+        with open(tdac, 'r') as tdac_file:
+            for l in tdac_file.readlines():
+                stripped_line = l.strip().replace('  ', ' ').split(' ')
+                if '#' in stripped_line:
+                    continue
+                filtered_line = filter(lambda a: a != '', stripped_line[1:]) 
+                int_filt_line = [int(i) for i in filtered_line]
+                tdac_list.append(int_filt_line)
+        for f, t in zip(fdac_list, tdac_list):
+            self._yarr_pixelconfig.append({'FDAC': f, 'TDAC': t})
+
         pass
 
 
@@ -170,6 +207,7 @@ class converter(object):
         
 
     def json_to_pybar_complex_conversion(self):
+
         for key in complex_conversion:
             if key == 'CMDcnt':
                 a = np.binary_repr(self._json_dict['CalPulseWidth'], width=16)

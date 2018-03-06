@@ -1,5 +1,6 @@
 from converter import converter
 from converter import pybar_yarr_mapping
+
 import json
 from tabulate import tabulate
 c = converter()
@@ -11,34 +12,38 @@ c.read_from_pybar(
     [])
 
 c.pybar_to_json_complex_conversion()
+c.dump_to_json()
+
+
+#d = c.read_from_json_2('dat/fei4.json')
+#c.json_to_pybar_complex_conversion()
 
 
 
-print c.pybar_keys, len(c.pybar_keys)
-print c.json_keys, len(c.json_keys)
+#print c.pybar_keys, len(c.pybar_keys)
+#print c.json_keys, len(c.json_keys)
 
-intersect = list(set(c.pybar_keys) & set(c.json_keys))
-print intersect, len(intersect)
-print
-print
-print 50 * '-'
+#intersect = list(set(c.pybar_keys) & set(c.json_keys))
+#for p in sorted(intersect):
+#    print p
+#print 50 * '-'
 
-table = []
-for p in sorted(intersect):
-    table.append([p, c._json_dict[p], c._pybar_dict[p]])
-for t in pybar_yarr_mapping:
+#table = []
+#for p in sorted(intersect):
+#    table.append([p, c._json_dict[p], c._pybar_dict[p]])
+#for t in pybar_yarr_mapping:
 
-    p, y = t[0], t[1]
-    if y == 'TOBEDETERMINED':
-        table.append(['CALCULATED/{}'.format(p), c._json_dict[p], c._pybar_dict[p]])
-    elif y == 'EFUSE':
-        table.append(['{}/{}'.format(y, p), 'NOT AVAILABLE', c._pybar_dict[p]])
-    else:
-        table.append(['{}/{}'.format(y, p), c._json_dict[y], c._pybar_dict[p]])
+ #   p, y = t[0], t[1]
+ #   if y == 'TOBEDETERMINED':
+ #       table.append(['CALCULATED/{}'.format(p), c._json_dict[p], c._pybar_dict[p]])
+ #   elif y == 'EFUSE':
+ #       table.append(['{}/{}'.format(y, p), 'NOT AVAILABLE', c._pybar_dict[p]])
+ #   else:
+ #       table.append(['{}/{}'.format(y, p), c._json_dict[y], c._pybar_dict[p]])
 
 
-headers = ['key', 'YARR value', 'PYBAR value']
-print tabulate(table, headers=headers)
+#headers = ['key', 'YARR value', 'PYBAR value']
+#print tabulate(table, headers=headers)
 
 
 

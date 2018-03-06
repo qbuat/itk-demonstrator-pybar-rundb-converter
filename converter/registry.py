@@ -1,0 +1,118 @@
+_all__ = [
+    'common_arguments',
+    'pybar_yarr_matched_args',
+    'json_complex_conversion'
+]
+
+
+def common_arguments():
+    arguments =  [
+        'Amp2Vbn',
+        'Amp2Vbp',
+        'Amp2VbpFol',
+        'Amp2Vbpff',
+        'CLK0_S0',
+        'CLK0_S1',
+        'CLK0_S2',
+        'CLK1_S0',
+        'CLK1_S1',
+        'CLK1_S2',
+        'CMDcnt',
+        'C_Inj_High',
+        'CalEn',
+        'Colpr_Addr',
+        'Colpr_Mode',
+        'Conf_AddrEnable',
+        'DisVbn',
+        'DisableColumnCnfg',
+        'EN_40M',
+        'EN_80M',
+        'EmptyRecordCnfg',
+        'ErrorMask',
+        'EventLimit',
+        'ExtAnaCalSW',
+        'ExtDigCalSW',
+        'GADCCompBias',
+        'GADCSel',
+        'HitDiscCnfg',
+        'LVDSDrvIref',
+        'No8b10b',
+        'PllIbias',
+        'PllIcp',
+        'PlsrDAC',
+        'PlsrDelay',
+        'PlsrPwr',
+        'PlsrRiseUpTau',
+        'PlsrVgOpAmp',
+        'PrmpVbnFol',
+        'PrmpVbp',
+        'PrmpVbpMsbEn',
+        'PrmpVbp_L',
+        'PrmpVbp_R',
+        'PrmpVbpf',
+        'ReadErrorReq',
+        'S0',
+        'S1',
+        'SELB',
+        'SR_Clock',
+        'StopClkPulse',
+        'TempSensIbias',
+        'Trig_Count',
+        'Trig_Lat',
+        'VrefAnTune',
+        'VrefDigTune',
+        ]
+    return arguments
+
+
+def pybar_yarr_matched_args():
+    arguments = [
+        ('Chip_ID', 'chipId'),
+        ('Chip_SN', 'EFUSE'),
+        ('Clk2OutCnfg', 'Clk2Out'),
+        ('DIGHITIN_SEL', 'DigHitIn_Sel'),
+        ('DINJ_OVERRIDE', 'DJO'),
+        ('EN_160M', 'EN_160'),
+        ('EN_320M', 'EN_320'),
+        ('EN_PLL', 'PLL_Enable'),
+        ('FdacVbn', 'FDACVbn'),
+        ('GADCStart', 'GADC_En'),
+        ('GateHitOr', 'HitOr'),
+        ('HITLD_IN', 'HitLD'),
+        ('Latch_En', 'Latch_Enable'),
+        ('LvdsDrvEn', 'LVDSDrvEn'),
+        ('MonleakRange', 'IleakRange'),
+        ('Pixel_Strobes', 'Pixel_latch_strobe'),
+        ('PlsrDacBias', 'PlsrDACbias'),
+        ('PlsrIdacRamp', 'PlsrIDACRamp'),
+        ('PrmpVbnLcc', 'PrmpVbnLCC'),
+        ('SR_Clr', 'SRClr'),
+        ('SR_Read', 'SRRead'),
+        ('SmallHitErase', 'SME'),
+        ('StopModeCnfg', 'StopModeConfig'),
+        ('TdacVbp', 'TDACVbp'),
+        ('TempSensDiodeBiasSel', 'TmpSensDiodeSel'),
+        ('Vthin_AltCoarse', 'Vthin_Coarse'),
+        ('Vthin_AltFine', 'Vthin_Fine'),
+        ('C_Inj_Low', 'sCap'),
+        ('C_Inj_Med', 'lCap'),
+        ('Vcal_Coeff_0', 'vcalOffset'),
+        ]
+    return arguments
+
+
+def json_complex_conversion():
+    arguments = [
+    'CalPulseWidth',
+    'CalPulseDelay',
+    'DisableColCnfg0',
+    'DisableColCnfg1',
+    'DisableColCnfg2',
+    'ErrorMask_0',
+    'ErrorMask_1',
+    'SELB0',
+    'SELB1',
+    'SELB2',
+    ]
+    return arguments
+   

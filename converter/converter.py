@@ -107,7 +107,10 @@ class converter(object):
                                 print '\t\t', kkk, type(datastore[k][kk][kkk]), datastore[k][kk][kkk]
                                 self._json_keys.append(str(kkk))
                                 self._json_dict[str(kkk)] = datastore[k][kk][kkk]
-            return datastore
+            a = datastore['FE-I4B']['PixelConfig'][0]['Hitbus']
+            print a
+            return True
+#            return datastore
 
 
 
@@ -179,8 +182,48 @@ class converter(object):
                 filtered_line = filter(lambda a: a != '', stripped_line[1:]) 
                 int_filt_line = [int(i) for i in filtered_line]
                 tdac_list.append(int_filt_line)
-        for f, t in zip(fdac_list, tdac_list):
-            self._yarr_pixelconfig.append({'FDAC': f, 'TDAC': t})
+
+        # parse the c_high, c_low and enable file
+        lcap_list = []
+        scap_list = []
+        enable_list = []
+        hitbus_list = []
+        lists = [lcap_list, scap_list, enable_list]
+        for l, mask in zip(lists, masks[:3]):
+            print 'read', mask
+            with open(mask, 'r') as file:
+                for line in file.readlines():
+                    if '#' in line:
+                        continue
+                    stripped_line = line.strip().replace('  ', '-').split('-')
+                    joined_line = ''.join(stripped_line[1:])
+                    int_line = [int(i) for i in joined_line]
+                    l.append(int_line)
+
+        # parse the imon file
+        print 'read', masks[3]
+        with open(masks[3], 'r') as file:
+            for line in file.readlines():
+                if '#' in line:
+                    continue
+                stripped_line = line.strip().replace('  ', '-').split('-')
+                joined_line = ''.join(stripped_line[1:])
+                print joined_line
+                int_line = [i for i in joined_line]
+                print int_line
+                hitbus_list.append(int_line)
+
+        # build the pixelconfig list (list of dictionary)
+        for irow, (f, t, lcap, scap, e, hitbus) in enumerate(zip(
+                fdac_list, tdac_list, lcap_list, scap_list, enable_list, hitbus_list)):
+            self._yarr_pixelconfig.append({
+                    'Enable': e,
+                    'FDAC': f, 
+                    'Hitbus': hitbus,
+                    'LCap': lcap,
+                    'Row': irow,
+                    'SCap': scap,
+                    'TDAC': t})
 
         pass
 

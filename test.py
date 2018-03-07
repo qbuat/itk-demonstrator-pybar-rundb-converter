@@ -2,7 +2,9 @@ from converter import converter
 
 import json
 from tabulate import tabulate
-c = converter()
+
+
+c = converter(yarr_to_pybar=True)
 #d = c.read_from_json('dat/fei4.json')
 c.read_from_pybar(
     './dat/module_0/configs/1_module_0_init_scan.cfg',
@@ -11,7 +13,7 @@ c.read_from_pybar(
     [
         './dat/module_0/masks/c_high_1_module_0_init_scan.dat',
         './dat/module_0/masks/c_low_1_module_0_init_scan.dat',
-        './dat/module_0/masks/c_enable_1_module_0_init_scan.dat',
+        './dat/module_0/masks/enable_1_module_0_init_scan.dat',
         './dat/module_0/masks/imon_1_module_0_init_scan.dat',])
 
 c.pybar_to_json_complex_conversion()

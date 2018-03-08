@@ -73,12 +73,14 @@ class converter(object):
         self._yarr_pixelconfig = []
 
         if yarr_to_pybar:
-            print 10 * '-'
+            print 30 * '-'
             print '--> Convert pybar files to YARR json'
+            print 30 * '-'
             self.read_from_json(JSON_TEMPLATE)
         else:
-            print 10 * '-'
+            print 30 * '-'
             print '--> Convert YARR json to pybar files'
+            print 30 * '-'
 
 
     def read_from_json(self, path):
@@ -107,10 +109,7 @@ class converter(object):
                                 print '\t\t', kkk, type(datastore[k][kk][kkk]), datastore[k][kk][kkk]
                                 self._json_keys.append(str(kkk))
                                 self._json_dict[str(kkk)] = datastore[k][kk][kkk]
-            a = datastore['FE-I4B']['PixelConfig'][0]['Hitbus']
-            print a
             return True
-#            return datastore
 
 
 
@@ -208,9 +207,7 @@ class converter(object):
                     continue
                 stripped_line = line.strip().replace('  ', '-').split('-')
                 joined_line = ''.join(stripped_line[1:])
-                print joined_line
-                int_line = [i for i in joined_line]
-                print int_line
+                int_line = [int(i) for i in joined_line]
                 hitbus_list.append(int_line)
 
         # build the pixelconfig list (list of dictionary)

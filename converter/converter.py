@@ -2,6 +2,7 @@ import os
 import json
 import ConfigParser
 import numpy as np
+import array
 from .registry import *
 
 __all__ = [
@@ -10,49 +11,6 @@ __all__ = [
 
 JSON_TEMPLATE = os.path.join(os.path.dirname(__file__), '../dat/fei4.json')
 
-
-
-pybar_yarr_mapping = [
-    ('Chip_ID', 'chipId'),
-    ('CMDcnt', 'TOBEDETERMINED'),
-    ('Chip_SN', 'EFUSE'),
-    ('Clk2OutCnfg', 'Clk2Out'),
-    ('DIGHITIN_SEL', 'DigHitIn_Sel'),
-    ('DINJ_OVERRIDE', 'DJO'),
-    ('DisableColumnCnfg', 'TOBEDETERMINED'),
-    ('EN_160M', 'EN_160'),
-    ('EN_320M', 'EN_320'),
-    ('EN_PLL', 'PLL_Enable'),
-    ('ErrorMask', 'TOBEDETERMINED'),
-    ('FdacVbn', 'FDACVbn'),
-    ('GADCStart', 'GADC_En'),
-    ('GateHitOr', 'HitOr'),
-    ('HITLD_IN', 'HitLD'),
-    ('Latch_En', 'Latch_Enable'),
-    ('LvdsDrvEn', 'LVDSDrvEn'),
-    ('MonleakRange', 'IleakRange'),
-    ('Pixel_Strobes', 'Pixel_latch_strobe'),
-    ('PlsrDacBias', 'PlsrDACbias'),
-    ('PlsrIdacRamp', 'PlsrIDACRamp'),
-    ('PrmpVbnLcc', 'PrmpVbnLCC'),
-    ('SELB' , 'TOBEDETERMINED'),
-    ('SR_Clr', 'SRClr'),
-    ('SR_Read', 'SRRead'),
-    ('SmallHitErase', 'SME'),
-    ('StopModeCnfg', 'StopModeConfig'),
-    ('TdacVbp', 'TDACVbp'),
-    ('TempSensDiodeBiasSel', 'TmpSensDiodeSel'),
-    ('Vthin_AltCoarse', 'Vthin_Coarse'),
-    ('Vthin_AltFine', 'Vthin_Fine'),
-    ('C_Inj_Low', 'sCap'),
-    ('C_Inj_Med', 'lCap'),
-    ('C_Inj_High', 'TOBEDETERMINED'),
-    ('Vcal_Coeff_0', 'vcalOffset'),
-]
-
-#complex_conversion = [
-#    m[0] for m in pybar_yarr_mapping if m[1] == 'TOBEDETERMINED'
-#]
 
 class converter(object):
     """
@@ -269,6 +227,48 @@ class converter(object):
                 self._json_dict[key] = self._json_dict['sCap'] + self._json_dict['lCap']
 
     def dump_to_pybar(self):
+        from .templates import config
+        out_dict = {}
+        for k in common_arguments():
+            print k
+            out_dict[k] = self._json_dict[k]
+        for p, y in pybar_yarr_matched_args():
+            print p, y
+            if y != 'EFUSE':
+                out_dict[p] = self._json_dict[y]
+            else:
+                out_dict[p] = 'dummy'
+                
+
+        out_dict['CMDcnt'] = 'dummy'
+        out_dict['DisableColumnCnfg'] = 'dummy'
+        out_dict['ErrorMask'] = 'dummy'
+        out_dict['SELB'] = 'dummy'
+        out_dict['C_Inj_High'] = 'dummy'
+        out_dict['Efuse_Sense'] = 'dummy'
+        out_dict['GADCVref'] = 'dummy'
+        out_dict['LvdsDrvSet06'] = 'dummy'
+        out_dict['LvdsDrvSet12'] = 'dummy'
+        out_dict['LvdsDrvSet30'] = 'dummy'
+        out_dict['LvdsDrvVos'] = 'dummy'
+        out_dict['TempSensDisable'] = 'dummy'
+        out_dict['C_High'] = './path/path'
+        out_dict['C_Low'] = './path/path'
+        out_dict['Enable'] = './path/path'
+        out_dict['EnableDigInj'] = './path/path'
+        out_dict['FDAC'] = './path/path'
+        out_dict['Imon'] = './path/path'
+        out_dict['TDAC'] = './path/path'
+        out_dict['Vcal_Coeff_1'] = 0.
+        out_dict['Pulser_Corr_C_Inj_Low'] = None
+        out_dict['Pulser_Corr_C_Inj_Med'] = None
+        out_dict['Pulser_Corr_C_Inj_High'] = None
+
+        print out_dict
+        for key in sorted(out_dict.keys()):
+            print key
+        print len(out_dict.keys())
+        print config.format(**out_dict)
         pass
 
     @property

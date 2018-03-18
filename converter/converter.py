@@ -165,7 +165,7 @@ class converter(object):
                     continue
                 stripped_line = line.strip().replace('  ', '-').split('-')
                 joined_line = ''.join(stripped_line[1:])
-                int_line = [int(i) for i in joined_line]
+                int_line = [int(np.invert(np.bool(i))) for i in joined_line]
                 hitbus_list.append(int_line)
 
         # build the pixelconfig list (list of dictionary)
@@ -185,23 +185,23 @@ class converter(object):
 
     def pybar_to_json_complex_conversion(self):
         
-        pybar_val = self._pybar_dict['CMDcnt']
-        self._dict_pybar_to_json_complex['CalPulseWidth'] = 0
-        self._dict_pybar_to_json_complex['CalPulseDelay'] = 0
+        pybar_val = np.binary_repr(int(self._pybar_dict['CMDcnt']), width=14)
+        self._dict_pybar_to_json_complex['CalPulseWidth'] = int(pybar_val[7::-1], 2)
+        self._dict_pybar_to_json_complex['CalPulseDelay'] = int(pybar_val[13:8:-1], 2)
 
-        pybar_val = self._pybar_dict['DisableColumnCnfg']
-        self._dict_pybar_to_json_complex['DisableColCnfg0'] = 0
-        self._dict_pybar_to_json_complex['DisableColCnfg1'] = 0
-        self._dict_pybar_to_json_complex['DisableColCnfg2'] = 0
+        pybar_val = np.binary_repr(int(self._pybar_dict['DisableColumnCnfg']), width=40)
+        self._dict_pybar_to_json_complex['DisableColCnfg0'] = int(pybar_val[16::-1], 2)
+        self._dict_pybar_to_json_complex['DisableColCnfg1'] = int(pybar_val[32:16:-1], 2)
+        self._dict_pybar_to_json_complex['DisableColCnfg2'] = int(pybar_val[:32:-1], 2)
 
-        pybar_val = self._pybar_dict['ErrorMask']
-        self._dict_pybar_to_json_complex['ErrorMask_0'] = 0
-        self._dict_pybar_to_json_complex['ErrorMask_1'] = 0
+        pybar_val = np.binary_repr(int(self._pybar_dict['ErrorMask']), width=32)
+        self._dict_pybar_to_json_complex['ErrorMask_0'] = int(pybar_val[:16], 2)
+        self._dict_pybar_to_json_complex['ErrorMask_1'] = int(pybar_val[16:], 2)
 
-        pybar_val = self._pybar_dict['SELB']
-        self._dict_pybar_to_json_complex['SELB0'] = 0
-        self._dict_pybar_to_json_complex['SELB1'] = 0
-        self._dict_pybar_to_json_complex['SELB2'] = 0
+        pybar_val = np.binary_repr(int(self._pybar_dict['SELB']), width=40)
+        self._dict_pybar_to_json_complex['SELB0'] = int(pybar_val[16::-1], 2)
+        self._dict_pybar_to_json_complex['SELB1'] = int(pybar_val[32:16:-1], 2)
+        self._dict_pybar_to_json_complex['SELB2'] = int(pybar_val[:32:-1], 2)
         
 
     def json_to_pybar_complex_conversion(self):
@@ -218,6 +218,8 @@ class converter(object):
                 self._json_dict[key] = self._json_dict['DisableColCnfg0'] + self._json_dict['DisableColCnfg1'] + self._json_dict['DisableColCnfg2']
             if key == 'ErrorMask':
                 self._json_keys.append(key)
+                a = np.binary_repr(self._json_dict['ErrorMask_0'], width=16)
+                b = np.binary_repr(self._json_dict['ErrorMask_1'], width=16)
                 self._json_dict[key] = self._json_dict['ErrorMask_0'] + self._json_dict['ErrorMask_1']
             if key == 'SELB':
                 self._json_keys.append(key)

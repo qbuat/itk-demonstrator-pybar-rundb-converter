@@ -19,7 +19,7 @@ CLK0_S1 {CLK0_S1}
 CLK0_S2 {CLK0_S2}
 CLK1_S0 {CLK1_S0}
 CLK1_S1 {CLK1_S1}
-CLK1_S2 {CLK0_S2}
+CLK1_S2 {CLK1_S2}
 CMDcnt {CMDcnt}
 CalEn {CalEn}
 Chip_SN {Chip_SN}
@@ -109,9 +109,9 @@ TDAC {TDAC}
 # FEI4 Calibration Parameters
 C_Inj_Low {C_Inj_Low}
 C_Inj_Med {C_Inj_Med}
-C_Inj_High {1.2f:C_Inj_High}
-Vcal_Coeff_0 {1.2f:Vcal_Coeff_0}
-Vcal_Coeff_1 {1.2f:Vcal_Coeff_1}
+C_Inj_High {C_Inj_High}
+Vcal_Coeff_0 {Vcal_Coeff_0}
+Vcal_Coeff_1 {Vcal_Coeff_1}
 Pulser_Corr_C_Inj_Low {Pulser_Corr_C_Inj_Low}
 Pulser_Corr_C_Inj_Med {Pulser_Corr_C_Inj_Med}
 Pulser_Corr_C_Inj_High {Pulser_Corr_C_Inj_High}

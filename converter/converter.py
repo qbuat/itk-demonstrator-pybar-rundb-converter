@@ -12,6 +12,8 @@ __all__ = [
 JSON_TEMPLATE = os.path.join(os.path.dirname(__file__), '../dat/fei4.json')
 
 
+
+
 class converter(object):
     """
     pybar / json converter for the ATLAS ITk 
@@ -266,10 +268,6 @@ class converter(object):
         out_dict['Pulser_Corr_C_Inj_Med'] = None
         out_dict['Pulser_Corr_C_Inj_High'] = None
 
-        print out_dict
-        for key in sorted(out_dict.keys()):
-            print key
-        print len(out_dict.keys())
         print config.format(**out_dict)
         pass
 

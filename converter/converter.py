@@ -3,6 +3,10 @@ import json
 import ConfigParser
 import numpy as np
 import array
+import shutil
+import itertools
+from bitarray import bitarray
+
 from .registry import *
 
 __all__ = [
@@ -46,6 +50,8 @@ class converter(object):
     def read_from_json(self, path):
         with open(path, 'r') as f:
             datastore = json.load(f)
+            self._yarr_pixelconfig = datastore['FE-I4B']['PixelConfig']
+
             for k in datastore.keys():
                 if isinstance(datastore[k], (list, dict)):
                     print k, type(datastore[k])
@@ -171,6 +177,7 @@ class converter(object):
                 hitbus_list.append(int_line)
 
         # build the pixelconfig list (list of dictionary)
+        self._yarr_pixelconfig = []
         for irow, (f, t, lcap, scap, e, hitbus) in enumerate(zip(
                 fdac_list, tdac_list, lcap_list, scap_list, enable_list, hitbus_list)):
             self._yarr_pixelconfig.append({
@@ -234,10 +241,8 @@ class converter(object):
         from .templates import config
         out_dict = {}
         for k in common_arguments():
-            print k
             out_dict[k] = self._json_dict[k]
         for p, y in pybar_yarr_matched_args():
-            print p, y
             if y != 'EFUSE':
                 out_dict[p] = self._json_dict[y]
             else:
@@ -256,20 +261,87 @@ class converter(object):
         out_dict['LvdsDrvSet30'] = 'dummy'
         out_dict['LvdsDrvVos'] = 'dummy'
         out_dict['TempSensDisable'] = 'dummy'
-        out_dict['C_High'] = './path/path'
-        out_dict['C_Low'] = './path/path'
-        out_dict['Enable'] = './path/path'
-        out_dict['EnableDigInj'] = './path/path'
-        out_dict['FDAC'] = './path/path'
-        out_dict['Imon'] = './path/path'
-        out_dict['TDAC'] = './path/path'
+        out_dict['C_High'] = './c_high.dat'
+        out_dict['C_Low'] = './c_low.dat'
+        out_dict['Enable'] = './enable.dat'
+        out_dict['EnableDigInj'] = './enablediginj.dat'
+        out_dict['FDAC'] = './fdac.dat'
+        out_dict['Imon'] = './imon.dat'
+        out_dict['TDAC'] = './tdac.dat'
         out_dict['Vcal_Coeff_1'] = 0.
         out_dict['Pulser_Corr_C_Inj_Low'] = None
         out_dict['Pulser_Corr_C_Inj_Med'] = None
         out_dict['Pulser_Corr_C_Inj_High'] = None
 
-        print config.format(**out_dict)
+        if os.path.exists('pybar_out'):
+            shutil.rmtree('pybar_out')
+        os.mkdir('pybar_out')
+
+        print 'write pybar_out/config.cfg'
+        with open('pybar_out/config.cfg', 'w') as f:
+            f.write(config.format(**out_dict))
+        
+        print self._yarr_pixelconfig[0].keys()
+        self.json_to_pybar_tdac_fdac('TDAC', 'pybar_out/tdac.dat')
+        self.json_to_pybar_tdac_fdac('FDAC', 'pybar_out/fdac.dat')
+
+        self.json_to_pybar_masks('LCap', 'pybar_out/c_high.dat')
+        self.json_to_pybar_masks('SCap', 'pybar_out/c_low.dat')
+        self.json_to_pybar_masks('Enable', 'pybar_out/enable.dat')
+        self.json_to_pybar_masks('Enable', 'pybar_out/enablediginj.dat')
+        # need to convert to the inverted bit
+        self.json_to_pybar_masks('Hitbus', 'pybar_out/imon.dat')
+
         pass
+
+
+    def json_to_pybar_tdac_fdac(self, key, out_name):
+
+        print 'write', out_name
+        listes = []
+        for d in self._yarr_pixelconfig:
+            listes.append(d[key])
+
+
+        with open(out_name, 'w') as f:
+            intro  = '###    1  2  3  4  5  6  7  8  9 10   11 12 13 14 15 16 17 18 19 20   21 22 23 24 25 26 27 28 29 30   31 32 33 34 35 36 37 38 39 40\n'
+            intro += '###   41 42 43 44 45 46 47 48 49 50   51 52 53 54 55 56 57 58 59 60   61 62 63 64 65 66 67 68 69 70   71 72 73 74 75 76 77 78 79 80\n'
+            f.write(intro)
+            block_line = "{0:>2} {1:>2} {2:>2} {3:>2} {4:>2} {5:>2} {6:>2} {7:>2} {8:>2} {9:>2}"
+            line = """{line:>3}a  {0}   {1}   {2}   {3}\n{line:>3}b  {4}   {5}   {6}   {7}\n"""
+        
+            for il, l in enumerate(listes):
+                blocks = [l[i * 10:(i + 1) *10] for i in xrange(8)]
+                blocks_lines = [block_line.format(*b) for b in blocks]
+                line_str = line.format(*blocks_lines, line=il + 1)
+                f.write(line_str)
+        return True
+
+    def json_to_pybar_masks(self, key, out_name):
+        print 'write', out_name
+        intro = '###  1     6     11    16     21    26     31    36     41    46     51    56     61    66     71    76\n'
+        block_line = '{0}{1}{2}{3}{4}-{5}{6}{7}{8}{9}'
+        line = '{line:3>}  {0}  {1}  {2}  {3}  {4}  {5}  {6}  {7}\n'
+        with open(out_name, 'w') as f:
+            f.write(intro)
+            for id, d in enumerate(self._yarr_pixelconfig):
+                if key == 'Hitbus':
+                    blocks = []
+                    for i in xrange(8):
+                        block = d[key][i * 10: (i + 1) * 10]
+                        inverted_block = []
+                        for bit in block:
+                            invert_bit = ~bitarray(str(bit))
+                            inverted_block.append(invert_bit.to01())
+                        blocks.append(inverted_block)
+                else:
+                    blocks = [d[key][i * 10: (i + 1) * 10] for i in xrange(8)]
+
+                blocks_lines = [block_line.format(*b) for b in blocks]
+                line_str = line.format(*blocks_lines, line=id + 1)
+                f.write(line_str)
+    
+
 
     @property
     def pybar_keys(self):

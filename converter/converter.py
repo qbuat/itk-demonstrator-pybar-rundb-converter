@@ -216,15 +216,21 @@ class converter(object):
     def json_to_pybar_complex_conversion(self, outdict):
 
         # CMDcnt
-        a = self._json_dict['CalPulseWidth']
-        b = self._json_dict['CalPulseDelay']
-        outdict['CMDcnt'] = 0
+        a = bitarray(np.binary_repr(self._json_dict['CalPulseWidth'], width=8))
+        b = bitarray(np.binary_repr(self._json_dict['CalPulseDelay'], width=5))
+        a.reverse()
+        b.reverse()
+        c = a + b
+        outdict['CMDcnt'] = int(c.to01(), 2)
 
         # DisableColumnCnfg
-        a = self._json_dict['DisableColCnfg0']
-        b = self._json_dict['DisableColCnfg1']
-        c = self._json_dict['DisableColCnfg2']
-        outdict['DisableColumnCnfg'] = 0
+        a = bitarray(np.binary_repr(self._json_dict['DisableColCnfg0'], width=16))
+        b = bitarray(np.binary_repr(self._json_dict['DisableColCnfg1'], width=16))
+        c = bitarray(np.binary_repr(self._json_dict['DisableColCnfg2'], width=8))
+        a.reverse()
+        b.reverse()
+        d = a + b + c
+        outdict['DisableColumnCnfg'] = int(d.to01(), 2)
 
         # ErrorMask
         a = bitarray(np.binary_repr(self._json_dict['ErrorMask_0'], width=16))
@@ -233,11 +239,14 @@ class converter(object):
         outdict['ErrorMask'] = int(c.to01(), 2)
 
         # SELB
-        a = self._json_dict['SELB0']
-        b = self._json_dict['SELB1']
-        c = self._json_dict['SELB2']
-        print a, b, c
-        outdict['SELB'] = 0
+        a = bitarray(np.binary_repr(self._json_dict['SELB0'], width=16))
+        b = bitarray(np.binary_repr(self._json_dict['SELB1'], width=16))
+        c = bitarray(np.binary_repr(self._json_dict['SELB2'], width=8))
+        a.reverse()
+        b.reverse()
+        c.reverse()
+        d = a + b + c
+        outdict['SELB'] = int(d.to01(), 2)
 
         # C_Inj_High
         a = self._json_dict['sCap']

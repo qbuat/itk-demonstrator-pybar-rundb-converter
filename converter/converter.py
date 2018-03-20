@@ -213,54 +213,58 @@ class converter(object):
         self._dict_pybar_to_json_complex['SELB2'] = int(pybar_val[:32:-1], 2)
         
 
-    def json_to_pybar_complex_conversion(self):
+    def json_to_pybar_complex_conversion(self, outdict):
 
-        for key in complex_conversion:
-            if key == 'CMDcnt':
-                a = np.binary_repr(self._json_dict['CalPulseWidth'], width=16)
-                b = np.binary_repr(self._json_dict['CalPulseDelay'], width=16)
-                c = a[7:0:-1] + b[13:8:-1]
-                self._json_keys.append(key)
-                self._json_dict[key] = int(c, 2)
-            if key == 'DisableColumnCnfg':
-                self._json_keys.append(key)
-                self._json_dict[key] = self._json_dict['DisableColCnfg0'] + self._json_dict['DisableColCnfg1'] + self._json_dict['DisableColCnfg2']
-            if key == 'ErrorMask':
-                self._json_keys.append(key)
-                a = np.binary_repr(self._json_dict['ErrorMask_0'], width=16)
-                b = np.binary_repr(self._json_dict['ErrorMask_1'], width=16)
-                self._json_dict[key] = self._json_dict['ErrorMask_0'] + self._json_dict['ErrorMask_1']
-            if key == 'SELB':
-                self._json_keys.append(key)
-                self._json_dict[key] =  self._json_dict['SELB0'] + self._json_dict['SELB1'] + self._json_dict['SELB2']
-            if key == 'C_Inj_High':
-                self._json_keys.append(key)
-                self._json_dict[key] = self._json_dict['sCap'] + self._json_dict['lCap']
+        # CMDcnt
+        a = self._json_dict['CalPulseWidth']
+        b = self._json_dict['CalPulseDelay']
+        outdict['CMDcnt'] = 0
 
+        # DisableColumnCnfg
+        a = self._json_dict['DisableColCnfg0']
+        b = self._json_dict['DisableColCnfg1']
+        c = self._json_dict['DisableColCnfg2']
+        outdict['DisableColumnCnfg'] = 0
+
+        # ErrorMask
+        a = bitarray(np.binary_repr(self._json_dict['ErrorMask_0'], width=16))
+        b = bitarray(np.binary_repr(self._json_dict['ErrorMask_1'], width=16))
+        c = a + b
+        outdict['ErrorMask'] = int(c.to01(), 2)
+
+        # SELB
+        a = self._json_dict['SELB0']
+        b = self._json_dict['SELB1']
+        c = self._json_dict['SELB2']
+        print a, b, c
+        outdict['SELB'] = 0
+
+        # C_Inj_High
+        a = self._json_dict['sCap']
+        b = self._json_dict['lCap']
+        outdict['C_Inj_High'] = a + b
+        pass
+        
     def dump_to_pybar(self):
         from .templates import config
         out_dict = {}
+
+        # fill common arguments from json
         for k in common_arguments():
             out_dict[k] = self._json_dict[k]
+        
+        # fill arguments with different names
         for p, y in pybar_yarr_matched_args():
+            print p, y
             if y != 'EFUSE':
                 out_dict[p] = self._json_dict[y]
             else:
                 out_dict[p] = 'dummy'
                 
+        # fill complex arguments that need computation
+        self.json_to_pybar_complex_conversion(out_dict)
 
-        out_dict['CMDcnt'] = 'dummy'
-        out_dict['DisableColumnCnfg'] = 'dummy'
-        out_dict['ErrorMask'] = 'dummy'
-        out_dict['SELB'] = 'dummy'
-        out_dict['C_Inj_High'] = 'dummy'
-        out_dict['Efuse_Sense'] = 'dummy'
-        out_dict['GADCVref'] = 'dummy'
-        out_dict['LvdsDrvSet06'] = 'dummy'
-        out_dict['LvdsDrvSet12'] = 'dummy'
-        out_dict['LvdsDrvSet30'] = 'dummy'
-        out_dict['LvdsDrvVos'] = 'dummy'
-        out_dict['TempSensDisable'] = 'dummy'
+        # fill arguments pointing to auxiliary files
         out_dict['C_High'] = './c_high.dat'
         out_dict['C_Low'] = './c_low.dat'
         out_dict['Enable'] = './enable.dat'
@@ -268,7 +272,7 @@ class converter(object):
         out_dict['FDAC'] = './fdac.dat'
         out_dict['Imon'] = './imon.dat'
         out_dict['TDAC'] = './tdac.dat'
-        out_dict['Vcal_Coeff_1'] = 0.
+
         out_dict['Pulser_Corr_C_Inj_Low'] = None
         out_dict['Pulser_Corr_C_Inj_Med'] = None
         out_dict['Pulser_Corr_C_Inj_High'] = None
@@ -281,7 +285,6 @@ class converter(object):
         with open('pybar_out/config.cfg', 'w') as f:
             f.write(config.format(**out_dict))
         
-        print self._yarr_pixelconfig[0].keys()
         self.json_to_pybar_tdac_fdac('TDAC', 'pybar_out/tdac.dat')
         self.json_to_pybar_tdac_fdac('FDAC', 'pybar_out/fdac.dat')
 
@@ -289,7 +292,6 @@ class converter(object):
         self.json_to_pybar_masks('SCap', 'pybar_out/c_low.dat')
         self.json_to_pybar_masks('Enable', 'pybar_out/enable.dat')
         self.json_to_pybar_masks('Enable', 'pybar_out/enablediginj.dat')
-        # need to convert to the inverted bit
         self.json_to_pybar_masks('Hitbus', 'pybar_out/imon.dat')
 
         pass

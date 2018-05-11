@@ -24,7 +24,7 @@ class converter(object):
     demonstrator
     """
 
-    def __init__(self, yarr_to_pybar=True, run_number=1, fe_name='module_0'):
+    def __init__(self, yarr_to_pybar=True, run_number=1, fe_name='module_0', scan_type='init'):
         """
         """
         self._keys = []
@@ -36,7 +36,8 @@ class converter(object):
         self._dict_pybar_to_json_complex = {}
         self._yarr_pixelconfig = []
         self._run_number = run_number
-        self._fe_name = 'module_0'
+        self._fe_name = fe_name
+        self._scan_type = scan_type
 
         if yarr_to_pybar:
             print 30 * '-'
@@ -139,6 +140,8 @@ class converter(object):
                 int_filt_line = [int(i) for i in filtered_line]
                 fdac_list.append(int_filt_line)
 
+        fdac_list_new = [fdac_list[i] + fdac_list[i+1] for i in xrange(len(fdac_list) / 2 - 1)]
+        
         # parse the tdac file
         tdac_list = []
         with open(tdac, 'r') as tdac_file:
@@ -149,6 +152,7 @@ class converter(object):
                 filtered_line = filter(lambda a: a != '', stripped_line[1:]) 
                 int_filt_line = [int(i) for i in filtered_line]
                 tdac_list.append(int_filt_line)
+        tdac_list_new = [tdac_list[i] + tdac_list[i+1] for i in xrange(len(tdac_list) / 2 - 1)]
 
         # parse the c_high, c_low and enable file
         lcap_list = []
@@ -181,7 +185,7 @@ class converter(object):
         # build the pixelconfig list (list of dictionary)
         self._yarr_pixelconfig = []
         for irow, (f, t, lcap, scap, e, hitbus) in enumerate(zip(
-                fdac_list, tdac_list, lcap_list, scap_list, enable_list, hitbus_list)):
+                fdac_list_new, tdac_list_new, lcap_list, scap_list, enable_list, hitbus_list)):
             self._yarr_pixelconfig.append({
                     'Enable': e,
                     'FDAC': f, 
@@ -276,13 +280,13 @@ class converter(object):
         self.json_to_pybar_complex_conversion(out_dict)
 
         # fill arguments pointing to auxiliary files
-        out_dict['TDAC']         = 'pybar_out/tdacs/tdac_{0}_{1}_init_scan.dat'.format(self._run_number, self._fe_name) 
-        out_dict['FDAC']         = 'pybar_out/fdacs/fdac_{0}_{1}_init_scan.dat'.format(self._run_number, self._fe_name) 
-        out_dict['C_High']       = 'pybar_out/masks/c_high_{0}_{1}_init_scan.dat'.format(self._run_number, self._fe_name)
-        out_dict['C_Low']        = 'pybar_out/masks/c_low_{0}_{1}_init_scan.dat'.format(self._run_number, self._fe_name)
-        out_dict['Enable']       = 'pybar_out/masks/enable_{0}_{1}_init_scan.dat'.format(self._run_number, self._fe_name)
-        out_dict['EnableDigInj'] = 'pybar_out/masks/enablediginj_{0}_{1}_init_scan.dat'.format(self._run_number, self._fe_name)
-        out_dict['Imon']         = 'pybar_out/masks/imon_{0}_{1}_init_scan.dat'.format(self._run_number, self._fe_name)
+        out_dict['TDAC']         = 'pybar_out/tdacs/tdac_{0}_{1}_{2}_scan.dat'.format(self._run_number, self._fe_name, self._scan_type) 
+        out_dict['FDAC']         = 'pybar_out/fdacs/fdac_{0}_{1}_{2}_scan.dat'.format(self._run_number, self._fe_name, self._scan_type) 
+        out_dict['C_High']       = 'pybar_out/masks/c_high_{0}_{1}_{2}_scan.dat'.format(self._run_number, self._fe_name, self._scan_type)
+        out_dict['C_Low']        = 'pybar_out/masks/c_low_{0}_{1}_{2}_scan.dat'.format(self._run_number, self._fe_name, self._scan_type)
+        out_dict['Enable']       = 'pybar_out/masks/enable_{0}_{1}_{2}_scan.dat'.format(self._run_number, self._fe_name, self._scan_type)
+        out_dict['EnableDigInj'] = 'pybar_out/masks/enablediginj_{0}_{1}_{2}_scan.dat'.format(self._run_number, self._fe_name, self._scan_type)
+        out_dict['Imon']         = 'pybar_out/masks/imon_{0}_{1}_{2}_scan.dat'.format(self._run_number, self._fe_name, self._scan_type)
 
 
         out_dict['Pulser_Corr_C_Inj_Low'] = None
@@ -296,18 +300,18 @@ class converter(object):
         os.mkdir('pybar_out/tdacs')
         os.mkdir('pybar_out/masks')
 
-        config_out_name = '{0}_{1}_init_scan.cfg'.format(self._run_number, self._fe_name)
+        config_out_name = '{0}_{1}_{2}_scan.cfg'.format(self._run_number, self._fe_name, self._scan_type)
         print 'write pybar_out/%s' % config_out_name
         with open('pybar_out/{}'.format(config_out_name), 'w') as f:
             f.write(config.format(**out_dict))
         
-        self.json_to_pybar_tdac_fdac('TDAC', 'pybar_out/tdacs/tdac_{0}_{1}_init_scan.dat'.format(self._run_number, self._fe_name))
-        self.json_to_pybar_tdac_fdac('FDAC', 'pybar_out/fdacs/fdac_{0}_{1}_init_scan.dat'.format(self._run_number, self._fe_name))
-        self.json_to_pybar_tdac_fdac('LCap', 'pybar_out/masks/c_high_{0}_{1}_init_scan.dat'.format(self._run_number, self._fe_name))
-        self.json_to_pybar_tdac_fdac('SCap', 'pybar_out/masks/c_low_{0}_{1}_init_scan.dat'.format(self._run_number, self._fe_name))
-        self.json_to_pybar_tdac_fdac('Enable', 'pybar_out/masks/enable_{0}_{1}_init_scan.dat'.format(self._run_number, self._fe_name))
-        self.json_to_pybar_tdac_fdac('Enable', 'pybar_out/masks/enablediginj_{0}_{1}_init_scan.dat'.format(self._run_number, self._fe_name))
-        self.json_to_pybar_tdac_fdac('Hitbus', 'pybar_out/masks/imon_{0}_{1}_init_scan.dat'.format(self._run_number, self._fe_name))
+        self.json_to_pybar_tdac_fdac('TDAC', 'pybar_out/tdacs/tdac_{0}_{1}_{2}_scan.dat'.format(self._run_number, self._fe_name, self._scan_type))
+        self.json_to_pybar_tdac_fdac('FDAC', 'pybar_out/fdacs/fdac_{0}_{1}_{2}_scan.dat'.format(self._run_number, self._fe_name, self._scan_type))
+        self.json_to_pybar_tdac_fdac('LCap', 'pybar_out/masks/c_high_{0}_{1}_{2}_scan.dat'.format(self._run_number, self._fe_name, self._scan_type))
+        self.json_to_pybar_tdac_fdac('SCap', 'pybar_out/masks/c_low_{0}_{1}_{2}_scan.dat'.format(self._run_number, self._fe_name, self._scan_type))
+        self.json_to_pybar_tdac_fdac('Enable', 'pybar_out/masks/enable_{0}_{1}_{2}_scan.dat'.format(self._run_number, self._fe_name, self._scan_type))
+        self.json_to_pybar_tdac_fdac('Enable', 'pybar_out/masks/enablediginj_{0}_{1}_{2}_scan.dat'.format(self._run_number, self._fe_name, self._scan_type))
+        self.json_to_pybar_tdac_fdac('Hitbus', 'pybar_out/masks/imon_{0}_{1}_{2}_scan.dat'.format(self._run_number, self._fe_name, self._scan_type))
 
         pass
 
@@ -318,8 +322,7 @@ class converter(object):
         listes = []
         for d in self._yarr_pixelconfig:
             listes.append(d[key])
-
-
+            
         with open(out_name, 'w') as f:
             intro  = '###    1  2  3  4  5  6  7  8  9 10   11 12 13 14 15 16 17 18 19 20   21 22 23 24 25 26 27 28 29 30   31 32 33 34 35 36 37 38 39 40\n'
             intro += '###   41 42 43 44 45 46 47 48 49 50   51 52 53 54 55 56 57 58 59 60   61 62 63 64 65 66 67 68 69 70   71 72 73 74 75 76 77 78 79 80\n'

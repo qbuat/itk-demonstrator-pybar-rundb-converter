@@ -134,7 +134,7 @@ class converter(object):
         with open(fdac, 'r') as fdac_file:
             for l in fdac_file.readlines():
                 stripped_line = l.strip().replace('  ', ' ').split(' ')
-                if '#' in stripped_line:
+                if '#' in stripped_line[0]:
                     continue
                 filtered_line = filter(lambda a: a != '', stripped_line[1:]) 
                 int_filt_line = [int(i) for i in filtered_line]
@@ -147,7 +147,7 @@ class converter(object):
         with open(tdac, 'r') as tdac_file:
             for l in tdac_file.readlines():
                 stripped_line = l.strip().replace('  ', ' ').split(' ')
-                if '#' in stripped_line:
+                if '#' in stripped_line[0]:
                     continue
                 filtered_line = filter(lambda a: a != '', stripped_line[1:]) 
                 int_filt_line = [int(i) for i in filtered_line]

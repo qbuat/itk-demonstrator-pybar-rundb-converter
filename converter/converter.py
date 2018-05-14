@@ -280,8 +280,8 @@ class converter(object):
         self.json_to_pybar_complex_conversion(out_dict)
 
         # fill arguments pointing to auxiliary files
-        out_dict['TDAC']         = '..\tdacs\tdac_{0}_{1}_{2}_scan.dat'.format(self._fe_name, self._run_number, self._scan_type) 
-        out_dict['FDAC']         = '..\fdacs\fdac_{0}_{1}_{2}_scan.dat'.format(self._fe_name, self._run_number, self._scan_type) 
+        out_dict['TDAC']         = '..\\tdacs\\tdac_{0}_{1}_{2}_scan.dat'.format(self._fe_name, self._run_number, self._scan_type) 
+        out_dict['FDAC']         = '..\\fdacs\\fdac_{0}_{1}_{2}_scan.dat'.format(self._fe_name, self._run_number, self._scan_type) 
         out_dict['C_High']       = '..\masks\c_high_{0}_{1}_{2}_scan.dat'.format(self._fe_name, self._run_number, self._scan_type)
         out_dict['C_Low']        = '..\masks\c_low_{0}_{1}_{2}_scan.dat'.format(self._fe_name, self._run_number, self._scan_type)
         out_dict['Enable']       = '..\masks\enable_{0}_{1}_{2}_scan.dat'.format(self._fe_name, self._run_number, self._scan_type)

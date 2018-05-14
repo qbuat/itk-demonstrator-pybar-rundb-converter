@@ -342,7 +342,7 @@ class converter(object):
         print 'write', out_name
         intro = '###  1     6     11    16     21    26     31    36     41    46     51    56     61    66     71    76\n'
         block_line = '{0}{1}{2}{3}{4}-{5}{6}{7}{8}{9}'
-        line = '{line:3>}  {0}  {1}  {2}  {3}  {4}  {5}  {6}  {7}\n'
+        line = '{line:>3}  {0}  {1}  {2}  {3}  {4}  {5}  {6}  {7}\n'
         with open(out_name, 'w') as f:
             f.write(intro)
             for id, d in enumerate(self._yarr_pixelconfig):

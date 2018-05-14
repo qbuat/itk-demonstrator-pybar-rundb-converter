@@ -313,18 +313,18 @@ class converter(object):
                     self._run_number, self._scan_type.capitalize(), 
                     date_1.isoformat(), date_2.isoformat(), (date_2 - date_1)))
 
-        config_out_name = '{0}_{1}_{2}_scan.cfg'.format(self._fe_name, self._run_number, self._scan_type)
+        config_out_name = '{1}_{0}_{2}_scan.cfg'.format(self._fe_name, self._run_number, self._scan_type)
         print 'write pybar_out/%s/configs/%s' % (self._fe_name, config_out_name)
         with open('pybar_out/{0}/configs/{1}'.format(self._fe_name, config_out_name), 'w') as f:
             f.write(config.format(**out_dict))
         
-        self.json_to_pybar_tdac_fdac('TDAC', 'pybar_out/{0}/tdacs/tdac_{0}_{1}_{2}_scan.dat'.format(self._fe_name, self._run_number, self._scan_type))
-        self.json_to_pybar_tdac_fdac('FDAC', 'pybar_out/{0}/fdacs/fdac_{0}_{1}_{2}_scan.dat'.format(self._fe_name, self._run_number, self._scan_type))
-        self.json_to_pybar_masks('LCap', 'pybar_out/{0}/masks/c_high_{0}_{1}_{2}_scan.dat'.format(self._fe_name, self._run_number, self._scan_type))
-        self.json_to_pybar_masks('SCap', 'pybar_out/{0}/masks/c_low_{0}_{1}_{2}_scan.dat'.format(self._fe_name, self._run_number, self._scan_type))
-        self.json_to_pybar_masks('Enable', 'pybar_out/{0}/masks/enable_{0}_{1}_{2}_scan.dat'.format(self._fe_name, self._run_number, self._scan_type))
-        self.json_to_pybar_masks('Enable', 'pybar_out/{0}/masks/enablediginj_{0}_{1}_{2}_scan.dat'.format(self._fe_name, self._run_number, self._scan_type))
-        self.json_to_pybar_masks('Hitbus', 'pybar_out/{0}/masks/imon_{0}_{1}_{2}_scan.dat'.format(self._fe_name, self._run_number, self._scan_type))
+        self.json_to_pybar_tdac_fdac('TDAC', 'pybar_out/{0}/tdacs/tdac_{1}_{0}_{2}_scan.dat'.format(self._fe_name, self._run_number, self._scan_type))
+        self.json_to_pybar_tdac_fdac('FDAC', 'pybar_out/{0}/fdacs/fdac_{1}_{0}_{2}_scan.dat'.format(self._fe_name, self._run_number, self._scan_type))
+        self.json_to_pybar_masks('LCap', 'pybar_out/{0}/masks/c_high_{1}_{0}_{2}_scan.dat'.format(self._fe_name, self._run_number, self._scan_type))
+        self.json_to_pybar_masks('SCap', 'pybar_out/{0}/masks/c_low_{1}_{0}_{2}_scan.dat'.format(self._fe_name, self._run_number, self._scan_type))
+        self.json_to_pybar_masks('Enable', 'pybar_out/{0}/masks/enable_{1}_{0}_{2}_scan.dat'.format(self._fe_name, self._run_number, self._scan_type))
+        self.json_to_pybar_masks('Enable', 'pybar_out/{0}/masks/enablediginj_{1}_{0}_{2}_scan.dat'.format(self._fe_name, self._run_number, self._scan_type))
+        self.json_to_pybar_masks('Hitbus', 'pybar_out/{0}/masks/imon_{1}_{0}_{2}_scan.dat'.format(self._fe_name, self._run_number, self._scan_type))
 
         pass
 
@@ -337,11 +337,11 @@ class converter(object):
             listes.append(d[key])
             
         with open(out_name, 'w') as f:
-            intro  = '###    1  2  3  4  5  6  7  8  9 10   11 12 13 14 15 16 17 18 19 20   21 22 23 24 25 26 27 28 29 30   31 32 33 34 35 36 37 38 39 40\n'
-            intro += '###   41 42 43 44 45 46 47 48 49 50   51 52 53 54 55 56 57 58 59 60   61 62 63 64 65 66 67 68 69 70   71 72 73 74 75 76 77 78 79 80\n'
+            intro  = '###    1  2  3  4  5  6  7  8  9 10   11 12 13 14 15 16 17 18 19 20   21 22 23 24 25 26 27 28 29 30   31 32 33 34 35 36 37 38 39 40\r\n'
+            intro += '###   41 42 43 44 45 46 47 48 49 50   51 52 53 54 55 56 57 58 59 60   61 62 63 64 65 66 67 68 69 70   71 72 73 74 75 76 77 78 79 80\r\n'
             f.write(intro)
             block_line = "{0:>2} {1:>2} {2:>2} {3:>2} {4:>2} {5:>2} {6:>2} {7:>2} {8:>2} {9:>2}"
-            line = """{line:>3}a  {0}   {1}   {2}   {3}\n{line:>3}b  {4}   {5}   {6}   {7}\n"""
+            line = """{line:>3}a  {0}   {1}   {2}   {3}\r\n{line:>3}b  {4}   {5}   {6}   {7}\r\n"""
         
             for il, l in enumerate(listes):
                 blocks = [l[i * 10:(i + 1) *10] for i in xrange(8)]
@@ -352,9 +352,9 @@ class converter(object):
 
     def json_to_pybar_masks(self, key, out_name):
         print 'write', out_name
-        intro = '###  1     6     11    16     21    26     31    36     41    46     51    56     61    66     71    76\n'
+        intro = '###  1     6     11    16     21    26     31    36     41    46     51    56     61    66     71    76\r\n'
         block_line = '{0}{1}{2}{3}{4}-{5}{6}{7}{8}{9}'
-        line = '{line:>3}  {0}  {1}  {2}  {3}  {4}  {5}  {6}  {7}\n'
+        line = '{line:>3}  {0}  {1}  {2}  {3}  {4}  {5}  {6}  {7}\r\n'
         with open(out_name, 'w') as f:
             f.write(intro)
             for id, d in enumerate(self._yarr_pixelconfig):

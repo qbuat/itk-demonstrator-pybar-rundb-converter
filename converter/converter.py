@@ -297,8 +297,13 @@ class converter(object):
         out_dict['Pulser_Corr_C_Inj_High'] = None
 
         if os.path.exists('pybar_out'):
-            shutil.rmtree('pybar_out')
-        os.mkdir('pybar_out')
+            rm_pybar_out = raw_input('pybar_out already exists. Do you want to remove it? [y/n]')
+            if rm_pybar_out == 'y':
+                shutil.rmtree('pybar_out')
+                os.mkdir('pybar_out')
+        else:
+            os.mkdir('pybar_out')
+
         os.mkdir('pybar_out/{}'.format(self._fe_name))
         os.mkdir('pybar_out/{}/configs'.format(self._fe_name))
         os.mkdir('pybar_out/{}/fdacs'.format(self._fe_name))

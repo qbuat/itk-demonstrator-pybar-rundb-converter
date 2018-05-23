@@ -8,6 +8,7 @@ import itertools
 from bitarray import bitarray
 import datetime
 import time
+import tables
 
 from .registry import *
 
@@ -40,6 +41,7 @@ class converter(object):
         self._run_number = run_number
         self._fe_name = fe_name
         self._scan_type = scan_type
+        self._h5name = None
 
         if yarr_to_pybar:
             print 30 * '-'
@@ -84,8 +86,19 @@ class converter(object):
 
 
 
-    def dump_to_json(self, output='tmp.json'):
+    def dump_to_json(self, output_config='run_conf.json', output='tmp.json'):
         
+        # run config
+        h5file = tables.open_file(self._h5name)
+        run_conf = h5file.root.configuration.run_conf
+        run_conf_dict = {}
+        for i in xrange(len(run_conf)):
+            run_conf_dict[run_conf[i][0]] = run_conf[i][1]
+        h5file.close()
+        run_conf_json = json.dumps(run_conf_dict, sort_keys=True, indent=3, separators=(',', ': '))
+        conf_json = open(output_config, 'wb')
+        conf_json.write(run_conf_json)
+
         with open(JSON_TEMPLATE, 'r') as ftemplate:
             template_json = json.load(ftemplate)
 
@@ -121,7 +134,10 @@ class converter(object):
 
 
     def read_from_pybar(
-        self, config, fdac, tdac, masks):
+        self, h5name, config, fdac, tdac, masks):
+
+        self._h5name = h5name
+
         # parse the config file
         with open(config, 'r') as config_file:
             for l in config_file.readlines():

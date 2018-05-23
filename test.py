@@ -25,6 +25,7 @@ if __name__ == '__main__':
     if args.out == 'json':
         c1 = converter(yarr_to_pybar=True)
         c1.read_from_pybar(
+            os.path.join(pybar_folder, '{run}_{name}_{scan}_scan.h5'.format(run=run, name=module_name, scan=scan_type)),
             os.path.join(pybar_folder, 'configs', '{run}_{name}_{scan}_scan.cfg'.format(run=run, name=module_name, scan=scan_type)),
             os.path.join(pybar_folder, 'fdacs', 'fdac_{run}_{name}_{scan}_scan.dat'.format(run=run, name=module_name, scan=scan_type)),
             os.path.join(pybar_folder, 'tdacs', 'tdac_{run}_{name}_{scan}_scan.dat'.format(run=run, name=module_name, scan=scan_type)),

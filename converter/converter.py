@@ -27,7 +27,7 @@ class converter(object):
     demonstrator
     """
 
-    def __init__(self, yarr_to_pybar=True, run_number=1, fe_name='module_0', scan_type='init'):
+    def __init__(self, pybar_to_yarr=True, run_number=1, fe_name='module_0', scan_type='init'):
         """
         """
         self._keys = []
@@ -43,7 +43,7 @@ class converter(object):
         self._scan_type = scan_type
         self._h5name = None
 
-        if yarr_to_pybar:
+        if pybar_to_yarr:
             print 30 * '-'
             print '--> Convert pybar files to YARR json'
             print 30 * '-'

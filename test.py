@@ -23,7 +23,7 @@ if __name__ == '__main__':
     scan_type = args.scan
 
     if args.out == 'json':
-        c1 = converter(yarr_to_pybar=True)
+        c1 = converter(pybar_to_yarr=True)
         c1.read_from_pybar(
             os.path.join(pybar_folder, '{run}_{name}_{scan}_scan.h5'.format(run=run, name=module_name, scan=scan_type)),
             os.path.join(pybar_folder, 'configs', '{run}_{name}_{scan}_scan.cfg'.format(run=run, name=module_name, scan=scan_type)),
@@ -39,7 +39,7 @@ if __name__ == '__main__':
         c1.dump_to_json(output='{name}.json'.format(name=module_name))
 
     else:
-        c2 = converter(yarr_to_pybar=False, run_number=run, fe_name=module_name, scan_type=scan_type)
+        c2 = converter(pybar_to_yarr=False, run_number=run, fe_name=module_name, scan_type=scan_type)
         # tmp.json
         c2.read_from_json('tmp.json')
         c2.dump_to_pybar()

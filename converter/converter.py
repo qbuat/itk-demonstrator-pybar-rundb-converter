@@ -206,7 +206,7 @@ class converter(object):
         for irow, (f, t, lcap, scap, e, hitbus) in enumerate(zip(
                 fdac_list_new, tdac_list_new, lcap_list, scap_list, enable_list, hitbus_list)):
             self._yarr_pixelconfig.append({
-                    'Enable': e,
+                    'Enable': e, #','.join((str(item_e) for item_e in e)),
                     'FDAC': f, 
                     'Hitbus': hitbus,
                     'LCap': lcap,

@@ -13,7 +13,7 @@ if __name__ == '__main__':
     parser.add_argument('--pybar-input-dir', default='/Users/quentin/Dropbox/JP2_1_ExampleConfig/')
     parser.add_argument('--runnumber', default=1)
     parser.add_argument('--name', default='JP2_1')
-    parser.add_argument('--scan', default='init', choices=['init', 'threshold'])
+    parser.add_argument('--scan', default='init', choices=['init', 'threshold', 'analog'])
 
     args = parser.parse_args()
 
@@ -36,7 +36,7 @@ if __name__ == '__main__':
                 os.path.join(pybar_folder, 'masks', 'imon_{run}_{name}_{scan}_scan.dat'.format(run=run, name=module_name, scan=scan_type)),])
         
         c1.pybar_to_json_complex_conversion()
-        c1.dump_to_json()
+        c1.dump_to_json(output='{name}.json'.format(name=module_name))
 
     else:
         c2 = converter(yarr_to_pybar=False, run_number=run, fe_name=module_name, scan_type=scan_type)

@@ -30,6 +30,7 @@ if __name__ == '__main__':
 
     for pb_run in pybar_runs:
         for feb in pb_run.febs:
+            print
             convert_onefeb_onerun(converter, 
                                   pb_run.run_number,
                                   feb,

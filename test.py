@@ -36,7 +36,7 @@ if __name__ == '__main__':
                 os.path.join(pybar_folder, 'masks', 'imon_{run}_{name}_{scan}_scan.dat'.format(run=run, name=module_name, scan=scan_type)),])
         
         c1.pybar_to_json_complex_conversion()
-        c1.dump_to_json(output='{name}.json'.format(name=module_name))
+        c1.dump_to_json(output='{name}_{run}.json'.format(name=module_name, run=run))
 
     else:
         c2 = converter(pybar_to_yarr=False, run_number=run, fe_name=module_name, scan_type=scan_type)

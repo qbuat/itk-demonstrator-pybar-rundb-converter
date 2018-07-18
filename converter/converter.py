@@ -19,6 +19,11 @@ __all__ = [
 JSON_TEMPLATE = os.path.join(os.path.dirname(__file__), '../dat/fei4.json')
 
 
+class PrettyEncoder(json.JSONEncoder):
+    def encode(self, obj):
+        if isinstance(obj, (list, tuple)):
+            return [a for a in obj]
+        return json.JSONEncoder.encode(self, obj)
 
 
 class converter(object):
@@ -95,7 +100,7 @@ class converter(object):
         for i in xrange(len(run_conf)):
             run_conf_dict[run_conf[i][0]] = run_conf[i][1]
         h5file.close()
-        run_conf_json = json.dumps(run_conf_dict, sort_keys=True, indent=3, separators=(',', ': '))
+        run_conf_json = json.dumps(run_conf_dict, sort_keys=True, indent=0, separators=(',', ': '))
         conf_json = open(output_config, 'wb')
         conf_json.write(run_conf_json)
 
@@ -128,7 +133,7 @@ class converter(object):
                             new_json['FE-I4B'][block][k] = arg_type(self._pybar_dict[p])
 
             new_json['FE-I4B']['PixelConfig'] = self._yarr_pixelconfig
-            new_json = json.dumps(new_json, sort_keys=True, indent=3, separators=(',', ': '))
+            new_json = json.dumps(new_json, sort_keys=True, indent=3, separators=(',', ': '), ensure_ascii=False)
             out_json = open(output, 'wb')
             out_json.write(new_json)
 
@@ -139,6 +144,7 @@ class converter(object):
         self._h5name = h5name
 
         # parse the config file
+        print 'read', config
         with open(config, 'r') as config_file:
             for l in config_file.readlines():
                 stripped_line = l.strip().split(' ')
@@ -203,6 +209,7 @@ class converter(object):
         # build the pixelconfig list (list of dictionary)
         self._yarr_pixelconfig = []
         print len(fdac_list_new), len(tdac_list_new), len(lcap_list), len(scap_list), len(enable_list), len(hitbus_list)
+
         for irow, (f, t, lcap, scap, e, hitbus) in enumerate(zip(
                 fdac_list_new, tdac_list_new, lcap_list, scap_list, enable_list, hitbus_list)):
             self._yarr_pixelconfig.append({
@@ -220,8 +227,8 @@ class converter(object):
     def pybar_to_json_complex_conversion(self):
         
         pybar_val = np.binary_repr(int(self._pybar_dict['CMDcnt']), width=14)
-        self._dict_pybar_to_json_complex['CalPulseWidth'] = int(pybar_val[7::-1], 2)
-        self._dict_pybar_to_json_complex['CalPulseDelay'] = int(pybar_val[13:8:-1], 2)
+        self._dict_pybar_to_json_complex['CalPulseDelay'] = int(pybar_val[7::-1], 2)
+        self._dict_pybar_to_json_complex['CalPulseWidth'] = int(pybar_val[13:8:-1], 2)
 
         pybar_val = np.binary_repr(int(self._pybar_dict['DisableColumnCnfg']), width=40)
         self._dict_pybar_to_json_complex['DisableColCnfg0'] = int(pybar_val[16::-1], 2)
@@ -229,8 +236,8 @@ class converter(object):
         self._dict_pybar_to_json_complex['DisableColCnfg2'] = int(pybar_val[:32:-1], 2)
 
         pybar_val = np.binary_repr(int(self._pybar_dict['ErrorMask']), width=32)
-        self._dict_pybar_to_json_complex['ErrorMask_0'] = int(pybar_val[:16], 2)
-        self._dict_pybar_to_json_complex['ErrorMask_1'] = int(pybar_val[16:], 2)
+        self._dict_pybar_to_json_complex['ErrorMask_1'] = int(pybar_val[:16], 2)
+        self._dict_pybar_to_json_complex['ErrorMask_0'] = int(pybar_val[16:], 2)
 
         pybar_val = np.binary_repr(int(self._pybar_dict['SELB']), width=40)
         self._dict_pybar_to_json_complex['SELB0'] = int(pybar_val[16::-1], 2)

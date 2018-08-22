@@ -178,7 +178,9 @@ class converter(object):
                 int_filt_line = [int(i) for i in filtered_line]
                 tdac_list.append(int_filt_line)
         tdac_list_new = [tdac_list[2 * i] + tdac_list[2 * i + 1] for i in xrange(len(tdac_list) / 2)]
-
+        print len(tdac_list[0]), len(tdac_list), tdac_list[0]
+        print len(tdac_list[1]), len(tdac_list), tdac_list[1]
+        print len(tdac_list_new[0]), len(tdac_list_new), tdac_list_new[0]
         # parse the c_high, c_low and enable file
         lcap_list = []
         scap_list = []
